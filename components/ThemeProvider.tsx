@@ -1,13 +1,12 @@
-// src/components/ThemeProvider.tsx
 "use client";
 
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
-      {children}
-    </NextThemesProvider>
-  );
+// We use React.ComponentProps to automatically extract the correct types 
+// from NextThemesProvider, entirely avoiding the broken 'dist/types' path!
+type ThemeProviderProps = React.ComponentProps<typeof NextThemesProvider>;
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
 }

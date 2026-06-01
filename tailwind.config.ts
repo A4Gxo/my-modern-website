@@ -1,7 +1,8 @@
+// tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: 'class', // This is the magic line for next-themes
+  darkMode: 'class', // <-- Add this line right here
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -12,5 +13,4 @@ const config: Config = {
   },
   plugins: [],
 };
-
 export default config;
