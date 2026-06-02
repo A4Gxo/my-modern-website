@@ -90,14 +90,15 @@ export default function Hero() {
         </div>
 
         {/* Right Column: Image */}
-        <div className="hidden lg:col-span-5 lg:mt-0 lg:flex lg:items-center lg:justify-center">
+        {/* Fix: Removed 'hidden', added 'flex mt-10' for mobile spacing! */}
+        <div className="mt-10 flex items-center justify-center lg:col-span-5 lg:mt-0">
           <div className="relative rounded-full bg-gradient-to-tr from-purple-600 to-cyan-400 p-1.5 shadow-2xl transition-all duration-300 dark:shadow-purple-900/40">
             <Image 
               src="/hero-image.jpg" 
               alt="Gyanaranjan - Modern Web Development" 
               width={400} 
               height={400}
-              className="aspect-square rounded-full border-4 border-white object-cover transition-colors duration-300 dark:border-gray-950"
+              className="aspect-square rounded-full border-4 border-white object-cover transition-colors duration-300 dark:border-gray-950 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96"
               priority 
             />
           </div>
