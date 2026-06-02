@@ -6,18 +6,34 @@ import React, { useState } from "react";
 export default function ContactForm() {
   const [status, setStatus] = useState<string>("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); 
     setStatus("Sending...");
 
-    // Simulate sending data to a server
-    setTimeout(() => {
-      setStatus("Message sent successfully!");
-      (e.target as HTMLFormElement).reset(); // Clear the form
-      
-      // Clear the success message after 3 seconds
-      setTimeout(() => setStatus(""), 3000);
-    }, 1500);
+    const formData = new FormData(e.currentTarget);
+    
+    // REPLACE THIS with your actual Web3Forms Access Key
+    formData.append("access_key", "14f9b8f7-a4a4-4e7c-9ac5-7e6516a229ff");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+
+      if (response.ok) {
+        setStatus("Message sent successfully!");
+        (e.target as HTMLFormElement).reset(); // Clear the form
+        
+        // Clear the success message after 4 seconds
+        setTimeout(() => setStatus(""), 4000);
+      } else {
+        setStatus("Error: Failed to send.");
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus("Error: Network issue.");
+    }
   };
 
   return (
@@ -43,6 +59,7 @@ export default function ContactForm() {
                 <input
                   type="text"
                   id="name"
+                  name="name" // Added name attribute
                   required
                   className="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 transition-colors focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:focus:border-cyan-400"
                   placeholder="John Doe"
@@ -55,6 +72,7 @@ export default function ContactForm() {
                 <input
                   type="email"
                   id="email"
+                  name="email" // Added name attribute
                   required
                   className="mt-2 w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 transition-colors focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:focus:border-cyan-400"
                   placeholder="john@example.com"
@@ -63,29 +81,30 @@ export default function ContactForm() {
             </div>
 
             {/* Category Dropdown */}
-            {/* Category Dropdown */}
-          <div>
-            <label htmlFor="category" className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300">
-              Inquiry Type
-            </label>
-            <select
-              id="category"
-              required
-              defaultValue=""
-              className="block w-full rounded-lg border border-gray-300 bg-white p-3 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-cyan-400 dark:focus:ring-cyan-400"
-            >
-              <option value="" disabled>Select an option...</option>
-              <option value="job">Job Opportunity</option>
-              <option value="freelance">Freelance Project</option>
-              <option value="general">General Inquiry</option>
-            </select>
-          </div>
+            <div>
+              <label htmlFor="category" className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300">
+                Inquiry Type
+              </label>
+              <select
+                id="category"
+                name="category" // Added name attribute
+                required
+                defaultValue=""
+                className="block w-full rounded-lg border border-gray-300 bg-white p-3 text-sm text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-cyan-400 dark:focus:ring-cyan-400"
+              >
+                <option value="" disabled>Select an option...</option>
+                <option value="job">Job Opportunity</option>
+                <option value="freelance">Freelance Project</option>
+                <option value="general">General Inquiry</option>
+              </select>
+            </div>
 
             {/* Message Textarea */}
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
               <textarea
                 id="message"
+                name="message" // Added name attribute
                 rows={5}
                 required
                 className="mt-2 w-full resize-none rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 transition-colors focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 dark:border-gray-800 dark:bg-gray-950 dark:text-white dark:focus:border-cyan-400"
@@ -96,14 +115,19 @@ export default function ContactForm() {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full rounded-lg bg-gray-900 px-6 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-gray-800 hover:shadow-lg hover:shadow-cyan-500/25 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
+              disabled={status === "Sending..."} // Prevent double clicks
+              className="w-full rounded-lg bg-gray-900 px-6 py-4 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-gray-800 hover:shadow-lg hover:shadow-cyan-500/25 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Send Message
+              {status === "Sending..." ? "Sending..." : "Send Message"}
             </button>
 
             {/* Dynamic Status Text */}
             {status && (
-              <p className={`mt-4 text-center text-sm font-medium ${status === "Sending..." ? "text-cyan-600 dark:text-cyan-400" : "text-green-600 dark:text-green-400"}`}>
+              <p className={`mt-4 text-center text-sm font-medium ${
+                status === "Sending..." ? "text-cyan-600 dark:text-cyan-400" : 
+                status.includes("Error") ? "text-red-500" : 
+                "text-green-600 dark:text-green-400"
+              }`}>
                 {status}
               </p>
             )}
